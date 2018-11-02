@@ -36,8 +36,8 @@ Vagrant.configure("2") do |config|
   # Install required packages
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    # HackRF and RTL-SDR
-    apt-get install -y hackrf rtl-sdr libusb-1.0-0-dev
+    # HackRF
+    apt-get install -y hackrf libhackrf0 libhackrf-dev libusb-1.0-0-dev
     # LuaRadio
     apt-get install -y software-properties-common
     apt-get install -y libvolk1-dev libfftw3-dev libfftw3-3
