@@ -22,25 +22,18 @@ Vagrant.configure("2") do |config|
   # config.vm.synced_folder "../data", "/vagrant_data"
 
   config.vm.provider "virtualbox" do |vb|
-  
     # Customize the amount of memory on the VM:
     vb.memory = "2048"
 
     # Pass through USB devices
     vb.customize ["modifyvm", :id, "--usb", "on"]
-    # Disable USB3.0 as HackRF does not have it
+    # Disable USB3.0 as HackRF does not have it, and can cause issues
     vb.customize ["modifyvm", :id, "--usbxhci", "off"]
-    # HackRF
+    # Pass through HackRF USB to VM
     vb.customize ['usbfilter', 'add', '0', '--target', :id, '--name', 'HackRF One', '--vendorid', '0x1d50', '--productid', '0x6089']
-
   end
-  #
-  # View the documentation for the provider you are using for more
-  # information on available options.
-
-  # Enable provisioning with a shell script. Additional provisioners such as
-  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
-  # documentation for more information about their specific syntax and use.
+  
+  # Install required packages
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
     # HackRF and RTL-SDR
@@ -68,11 +61,10 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     sudo mv -f 52-hackrf.rules /etc/udev/rules.d/ #Need to use sudo here as we don't have perms to copy direct
     sudo udevadm control --reload-rules
-    sudo adduser vagrant plugdev
+    sudo adduser vagrant plugdev                  #Add ourselves to the right group for the rules
   SHELL
 
-  
-  # Now reboot to reattach USB device with new rules, and add user to plugdev
+  # Now reboot to reattach USB device with new rules, and add user to plugdev group
   config.vm.provision :reload
 
 end
